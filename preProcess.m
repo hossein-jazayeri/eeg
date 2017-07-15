@@ -1,12 +1,12 @@
 clear ; close all; clc
 
-root_folder = 'D:\Zahra\ProjectData\';
-standard_10_5 = 'C:\Program Files\MATLAB\eeglab13_6_5b\plugins\dipfit2.3\standard_BESA\standard-10-5-cap385.elp';
-standard_10_10 = 'C:\Program Files\MATLAB\eeglab13_6_5b\sample_locs\Standard-10-10-Cap33.locs';
+root_folder = 'C:\Users\Hossein Jazayeri\Documents\MATLAB\Data\';
+standard_10_5 = 'C:\Users\Hossein Jazayeri\Documents\MATLAB\eeglab14_1_1b\plugins\dipfit2.3\standard_BESA\standard-10-5-cap385.elp';
+standard_10_10 = 'C:\Users\Hossein Jazayeri\Documents\MATLAB\eeglab14_1_1b\sample_locs\Standard-10-10-Cap33.locs';
 patients = dir(root_folder);
 patients = {patients([patients.isdir]).name};
 patients = patients(~ismember(patients,{'.','..'}));
-[r c] = size(patients);
+c = size(patients, 2);
 
 for index = 1:c
     patient = patients(index);
