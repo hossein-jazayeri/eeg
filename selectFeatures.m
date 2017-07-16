@@ -1,10 +1,10 @@
 clear ; close all; clc
 
-root_folder = 'data';
+root_folder = '..\ProjectData\';
 max_significance_level = 0.051;
 r_ids = [727;729;731;732;766;790;792;802;811;812;814;823;828;830;839;843;856;870;879;905;911;913;915;919;];
 nr_ids = [730;749;752;784;821;824;826;827;838;847;848;850;855;874;876;877;881;896;906;920;924;];
-features_count = 33;
+max_features_count = 33;
 
 patients = dir(root_folder);
 patients = {patients([patients.isdir]).name};
@@ -14,7 +14,7 @@ r_index = 1;nr_index = 1;
 R  = zeros(33, 33, 4, size(r_ids, 1));
 NR = zeros(33, 33, 4, size(nr_ids, 1));
 
-measure = input('What is the measure? [gpdc|ddtf|pcoh]', 's');
+measure = input('What is the measure? [gpdc|ddtf|pcoh] ', 's');
 
 disp('Constructing R & NR matrices in 4 frequency bands on average of significant connectivity values...');
 for index = 1:patients_count
@@ -68,19 +68,18 @@ save(strcat(root_folder, measure, '_R_NR.mat'), 'R', 'NR');
 
 R_M = mean(R, 4);
 NR_M = mean(NR, 4);
-features = zeros(4, features_count);
+features = zeros(4, max_features_count);
 
 disp('Selecting features for each frequency...');
 for frequency = 1:4
     significance_level = 0.05;
-    test_decision = 0;
     while significance_level < max_significance_level
         test_decision = ttest2(R_M(:,:,frequency), NR_M(:,:,frequency), 'Alpha', significance_level);
         features_count = size(find(test_decision == 1), 2);
         significance_level = significance_level + 0.001;
     end
 
-    padd_size = features_count - size(find(test_decision == 1), 2);
+    padd_size = max_features_count - size(find(test_decision == 1), 2);
     if padd_size > 0
         features(frequency, :) = padarray(find(test_decision == 1), [0 padd_size], 'post')';
     else
@@ -91,5 +90,5 @@ end
 save(strcat(root_folder, measure, '_features.mat'), 'features');
 
 fprintf('max significance level: %f\n', significance_level);
-Features
+features
 %dataset({features strcat('C', linspace(1, features_count, features_count))}, 'obsnames', {'DELTA', 'THETA', 'ALPHA', 'BETA'})
