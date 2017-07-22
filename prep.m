@@ -19,8 +19,8 @@ for index = 1:c
     EEG = pop_resample( EEG, 256);
     EEG = pop_rejcont(EEG, 'freqlimit', [20 40], 'taper', 'hamming');
     
-    reportFile = strcat('.\Report\', patient, 'Report.pdf');
-    summaryFile = strcat('.\Report\', patient, 'Summary.pdf');
+    reportFile = strcat('.\', patient, 'Report.pdf');
+    summaryFile = strcat('.\', patient, 'Summary.html');
     EEG = prepPipeline(EEG, struct('referenceChannels', [1:33], 'evaluationChannels', [1:33], 'rereferencedChannels', [1:33], 'lineFrequencies', [60  120], ...
         'Fs', 256, 'ignoreBoundaryEvents', true, 'cleanupReference', true, 'keepFiltered', false, 'removeInterpolatedChannels', true, ...
         'reportingLevel', 'Verbose', 'reportMode', 'normal', 'publishOn', true, 'sessionFilePath', reportFile{1}, 'summaryFilePath', summaryFile{1}));
