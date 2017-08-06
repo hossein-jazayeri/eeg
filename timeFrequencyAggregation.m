@@ -1,0 +1,19 @@
+function C = timeFrequencyAggregation(M)
+	chunk = 1;
+	[c1, c2, f, t] = size(M);
+	M_TS = zeros(c1, c2, f, size(1:20:t, 2));
+	for ts = 1:size(M_TS, 4)
+		M_TS(:,:,:,ts) = median(M(:,:,:,chunk:chunk+20-1:end), 4);
+		chunk = chunk + 20;
+	end
+
+	M_TS_M = mean(M_TS, 4);
+
+	C = cat(...
+		3, ...
+		median(M_TS_M(:,:,1:3), 3), ...
+		median(M_TS_M(:,:,4:7), 3), ...
+		median(M_TS_M(:,:,8:13), 3), ...
+		median(M_TS_M(:,:,14:end), 3) ...
+	);
+end
