@@ -12,7 +12,7 @@ function modelFit()
             EEG.CAT.MODEL = est_fitMVAR(EEG, 'algorithm', 'Vieira-Morf', 'morder', morder);
             [whitestats, pc, stability] = est_validateMVAR(aic_EEG, 'checkConsistency', [], 'checkResidualVariance', []);
         end
-        Conn = est_mvarConnectivity(EEG, EEG.CAT.MODEL, 'freqs', (1:20),'connmethods', {'GPDC', 'dDTF', 'pCoh'});
+        Conn = est_mvarConnectivity(EEG, EEG.CAT.MODEL, 'freqs', (1:28),'connmethods', {'GPDC', 'dDTF', 'pCoh'});
         gpdc = Conn.GPDC;
         ddtf = Conn.dDTF;
         ddtf = Conn.pCoh;
