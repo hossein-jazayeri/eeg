@@ -7,57 +7,74 @@ function selectFeature()
     [input_root, inputs, output_root] = getPath(false, 'file', true); % LOAD ZERO PADDED DATA
     patients_count = size(inputs, 2);
 
-	r_index = 1; nr_index = 1;
-	GPDC_R  = zeros(33, 33, 4, size(r_ids, 1));
-	GPDC_NR = zeros(33, 33, 4, size(nr_ids, 1));
-	DDTF_R  = zeros(33, 33, 4, size(r_ids, 1));
-	DDTF_NR = zeros(33, 33, 4, size(nr_ids, 1));
-	PCOH_R  = zeros(33, 33, 4, size(r_ids, 1));
-	PCOH_NR = zeros(33, 33, 4, size(nr_ids, 1));
-	
+	r_index = 1;
+    nr_index = 1;
+    [GPDC_R, GPDC_NR, DDTF_R, DDTF_NR, PCOH_R, PCOH_NR, GGC_R, GGC_NR, DTF_R, DTF_NR, ICOH_R, ICOH_NR] = ...
+        initR_NR(size(r_ids, 1), size(nr_ids, 1), 'all');
+
 	disp('Constructing R & NR...');
 	for index = 1:patients_count
 		filename = inputs(index);
-		patient_number = str2num(filename{1}(1:3));
+		patient_number = str2double(filename{1}(1:3));
 
-		if isempty(strmatch(patient_number, r_ids)) && isempty(strmatch(patient_number, nr_ids))
+		if isempty(strncmp(patient_number, r_ids, 3)) && isempty(strncmp(patient_number, nr_ids, 3))
 			continue;
 		end
 
 		path = strcat(input_root, '\', filename);
-		load(path{1}); % load gpdc, ddtf, pcoh
+		load(path{1}); % load gpdc, ddtf, pcoh, dtf, ggc, icoh
 
 		GPDC_C = timeFrequencyAggregation(gpdc);
 		DDTF_C = timeFrequencyAggregation(ddtf);
 		PCOH_C = timeFrequencyAggregation(pcoh);
+		GGC_C  = timeFrequencyAggregation(ggc);
+		DTF_C  = timeFrequencyAggregation(dtf);
+		ICOH_C = timeFrequencyAggregation(icoh);
 		
 		if strmatch(patient_number, r_ids)
 			disp(strcat(num2str(patient_number), ' is responder'));
 			GPDC_R(:,:,:,r_index) = GPDC_C;
 			DDTF_R(:,:,:,r_index) = DDTF_C;
 			PCOH_R(:,:,:,r_index) = PCOH_C;
+			GGC_R(:,:,:,r_index)  = GGC_C;
+			DTF_R(:,:,:,r_index)  = DTF_C;
+			ICOH_R(:,:,:,r_index) = ICOH_C;
 			r_index = r_index + 1;
 		else
 			disp(strcat(num2str(patient_number), ' is non-responder'));
 			GPDC_NR(:,:,:,nr_index) = GPDC_C;
 			DDTF_NR(:,:,:,nr_index) = DDTF_C;
 			PCOH_NR(:,:,:,nr_index) = PCOH_C;
+			GGC_NR(:,:,:,nr_index)  = GGC_C;
+			DTF_NR(:,:,:,nr_index)  = DTF_C;
+			ICOH_NR(:,:,:,nr_index) = ICOH_C;
 			nr_index = nr_index + 1;
 		end
 	end
 	disp('Done');
-	save(strcat(output_root, '\R_NR.mat'), 'GPDC_R', 'GPDC_NR', 'DDTF_R', 'DDTF_NR', 'PCOH_R', 'PCOH_NR');
+	save(strcat(output_root, '\R_NR.mat'), ...
+        'GPDC_R', 'GPDC_NR', 'DDTF_R', 'DDTF_NR', 'PCOH_R', 'PCOH_NR', ...
+        'GGC_R', 'GGC_NR', 'DTF_R', 'DTF_NR', 'ICOH_R', 'ICOH_NR');
 
-	for measure = {'gpdc', 'ddtf', 'pcoh'}
+	for measure = {'gpdc', 'ddtf', 'pcoh', 'ggc', 'dtf', 'icoh'}
 		if strmatch(measure, 'gpdc')
 			R_M = mean(GPDC_R, 4);
 			NR_M = mean(GPDC_NR, 4);
 		elseif strmatch(measure, 'ddtf')
 			R_M = mean(DDTF_R, 4);
 			NR_M = mean(DDTF_NR, 4);
-			elseif strmatch(measure, 'pcoh')
+		elseif strmatch(measure, 'pcoh')
 			R_M = mean(PCOH_R, 4);
 			NR_M = mean(PCOH_NR, 4);
+		elseif strmatch(measure, 'ggc')
+			R_M = mean(GGC_R, 4);
+			NR_M = mean(GGC_NR, 4);
+        elseif strmatch(measure, 'dtf')
+			R_M = mean(DTF_R, 4);
+			NR_M = mean(DTF_NR, 4);
+		elseif strmatch(measure, 'icoh')
+			R_M = mean(ICOH_R, 4);
+			NR_M = mean(ICOH_NR, 4);
 		end
 		FEATURES = zeros(4, max_FEATURES_count);
 
@@ -85,9 +102,16 @@ function selectFeature()
 			DDTF_FEATURES = FEATURES;
 		elseif strmatch(measure, 'pcoh')
 			PCOH_FEATURES = FEATURES;
+		elseif strmatch(measure, 'ggc')
+			GGC_FEATURES = FEATURES;
+        elseif strmatch(measure, 'dtf')
+			DTF_FEATURES = FEATURES;
+		elseif strmatch(measure, 'icoh')
+			ICOH_FEATURES = FEATURES;
 		end
 
 		fprintf('max significance level: %f\n', significance_level);
 	end
-	save(strcat(output_root, '\FEATURES.mat'), 'GPDC_FEATURES', 'DDTF_FEATURES', 'PCOH_FEATURES');
+	save(strcat(output_root, '\FEATURES.mat'), 'GPDC_FEATURES', 'DDTF_FEATURES', 'PCOH_FEATURES', ...
+        'GGC_FEATURES', 'DTF_FEATURES', 'ICOH_FEATURES');
 end
