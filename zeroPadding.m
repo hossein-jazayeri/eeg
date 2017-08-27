@@ -17,7 +17,7 @@ function zeroPadding()
     rejected_channels{821} = [1 2 9 14 19 28 33];
     rejected_channels{823} = [1 2 5 10 14 23 25 28];
     rejected_channels{824} = [1 2 14 19 23 25 28];
-    rejected_channels{826} = [1 2 19 20 25 26];
+    rejected_channels{826} = [1 2 14 19 24 26 28];
     rejected_channels{827} = [1 2 19 20 25 26];
     rejected_channels{828} = [1 2 9 10 14 19 26 28];
     rejected_channels{830} = [1 2 9 10 14 19 24 28];
@@ -51,7 +51,7 @@ function zeroPadding()
         filename = inputs(index);
         fprintf('zero padding %s ...', filename{1});
         path = strcat(input_root, '\', filename);
-        load(path{1}); % load gpdc, ddtf, pcoh
+        load(path{1}); % load gpdc, ddtf, pcoh, ...
         
         
         rc = rejected_channels{str2double(filename{1}(1:3))};
@@ -62,8 +62,8 @@ function zeroPadding()
             gpdc = zeroPadMetric(gpdc, channel_number);
             ddtf = zeroPadMetric(ddtf, channel_number);
             pcoh = zeroPadMetric(pcoh, channel_number);
-            dtf = zeroPadMetric(dtf, channel_number);
             ggc = zeroPadMetric(ggc, channel_number);
+            dtf = zeroPadMetric(dtf, channel_number);
             icoh = zeroPadMetric(icoh, channel_number);
         end
 

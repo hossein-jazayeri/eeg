@@ -1,13 +1,11 @@
 function svm()
 	%[filename, path] = uigetfile('D:\Zahra\DATA\FEATURES.mat', 'Select FEATURES');
     %load(strcat(path, filename)); % load selected channels to (GPDC|DDTF|PCOH)_FEATURES variable [4x33]
-    load('C:\Users\Hossein Jazayeri\Documents\MATLAB\eeg\data\FEATURES.mat');
 
 	%[filename, path] = uigetfile('D:\Zahra\DATA\R_NR.mat', 'Select R_NR');
     %load(strcat(path, filename)); % load (GPDC|DDTF|PCOH)_R_NR -> channel,channel,frequency,patient
-    load('C:\Users\Hossein Jazayeri\Documents\MATLAB\eeg\data\R_NR.mat');
 
-    for measure = {'gpdc', 'pcoh', 'ddtf'}
+    for measure = {'gpdc', 'pcoh', 'ddtf', 'ggc', 'dtf', 'icoh'}
         if strncmp(measure, 'gpdc', 4)
             Rs = GPDC_R;
             NRs = GPDC_NR;
@@ -19,6 +17,18 @@ function svm()
         elseif strncmp(measure, 'pcoh', 4)
             Rs = PCOH_R;
             NRs = PCOH_NR;
+            features = PCOH_FEATURES;
+        elseif strncmp(measure, 'ggc', 4)
+            Rs = GGC_R;
+            NRs = GGC_NR;
+            features = GPDC_FEATURES;
+        elseif strncmp(measure, 'dtf', 4)
+            Rs = DTF_R;
+            NRs = DTF_NR;
+            features = DDTF_FEATURES;
+        elseif strncmp(measure, 'icoh', 4)
+            Rs = ICOH_R;
+            NRs = ICOH_NR;
             features = PCOH_FEATURES;
         end
 
