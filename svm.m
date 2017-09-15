@@ -1,4 +1,4 @@
-function preSVM()
+function svm()
     measures = {'gpdc', 'pcoh', 'ddtf', 'ggc', 'dtf', 'icoh'};
 	[filename, path] = uigetfile('D:\Zahra\DATA\FEATURES.mat', 'Select FEATURES');
     load(strcat(path, filename)); % load selected channels to FEATURES variable [4x33]
@@ -6,7 +6,7 @@ function preSVM()
 	[filename, path] = uigetfile('D:\Zahra\DATA\Rs_NRs.mat', 'Select Rs_NRs');
     S = load(strcat(path, filename)); % load Rs & NRs -> channel,channel,frequency,patient
     Xy = containers.Map;
-    fprintf('measure | frequency | train accuracy | test accuracy\n');
+    fprintf('measure | frequency | validation accuracy\n');
     for measure = measures
         Rs = S.Rs(measure{1});
         NRs = S.NRs(measure{1});
@@ -22,15 +22,24 @@ function preSVM()
             NZ_Rs = Rs(NZ_channels, NZ_channels, frequency, :);
             NZ_NRs = NRs(NZ_channels, NZ_channels, frequency, :);
 
-            %[X, y, X_test, y_test] = doubleInputSize(NZ_Rs, NZ_NRs, Rs_dataset_size, NRs_dataset_size, NZ_channels_size, 0.7);
-            [X, y, X_test, y_test] = doubleInputSizeExcludeDiagonal(NZ_Rs, NZ_NRs, Rs_dataset_size, NRs_dataset_size, NZ_channels_size, 0.7);
-            %[X, y, X_test, y_test] = correspondingsMeanExcludeDiagonal(NZ_Rs, NZ_NRs, Rs_dataset_size, NRs_dataset_size, NZ_channels_size, 0.7);
+            %[X, y] = doubleInputSize(NZ_Rs, NZ_NRs, Rs_dataset_size, NRs_dataset_size, NZ_channels_size);
+            [X, y] = doubleInputSizeExcludeDiagonal(NZ_Rs, NZ_NRs, Rs_dataset_size, NRs_dataset_size, NZ_channels_size);
+            %[X, y] = correspondingsMeanExcludeDiagonal(NZ_Rs, NZ_NRs, Rs_dataset_size, NRs_dataset_size, NZ_channels_size);
 
-            Xy(strcat(measure{1}, num2str(frequency))) = [[X;X_test] [y;y_test]];
+            Xy(strcat(measure{1}, num2str(frequency))) = [X y];
 
-            model = svmtrain(X, y);
-            fprintf('%s          %d           %.1f%%           %.1f%%\n', measure{1}, frequency, ...
-                mean(double(svmclassify(model, X) == y)) * 100, mean(double(svmclassify(model, X_test) == y_test)) * 100);
+            model = fitcsvm(X, y, ...
+                'KernelFunction', 'gaussian', ...
+                'PolynomialOrder', [], ...
+                'KernelScale', 4.3, ...
+                'BoxConstraint', 1, ...
+                'Standardize', true, ...
+                'ClassNames', [1; 0]);
+            partitionedModel = crossval(model, 'KFold', 10);
+            %[validationPredictions, validationScores] = kfoldPredict(partitionedModel);
+            validationAccuracy = 1 - kfoldLoss(partitionedModel, 'LossFun', 'ClassifError');
+            
+            fprintf('%s          %d             %.1f%%\n', measure{1}, frequency, validationAccuracy * 100);
         end
     end
 
