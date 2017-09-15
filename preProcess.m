@@ -1,5 +1,5 @@
 function preProcess()
-    [input_root, inputs, output_root, standard_10_5, standard_10_10] = getPath(true);
+    [input_root, inputs, output_root, standard_10_5, standard_10_10] = getPath(true, 'folder', true);
     input_size = size(inputs, 2);
     for index = 1:input_size
         patient_number = inputs(index);
