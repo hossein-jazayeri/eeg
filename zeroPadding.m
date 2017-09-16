@@ -53,7 +53,6 @@ function zeroPadding()
         path = strcat(input_root, '\', filename);
         load(path{1}); % load gpdc, ddtf, pcoh, ...
         
-        
         rc = rejected_channels{str2double(filename{1}(1:3))};
         rc_count = size(rc, 2);
         for rc_index = 1:rc_count
