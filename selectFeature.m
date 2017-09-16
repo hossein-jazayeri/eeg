@@ -6,7 +6,7 @@ function selectFeature()
     [input_root, inputs, output_root] = getPath(false, 'file', true); % LOAD ZERO PADDED DATA
     patients_count = size(inputs, 2);
 
-    fprintf('Time frequency aggregation...');
+    fprintf('Time & frequency aggregation...');
     C = containers.Map;
     for index = 1:patients_count
         filename = inputs(index);
@@ -47,7 +47,7 @@ function selectFeature()
             end
         end
         Rs(measure{1}) = R;
-        NRs(measure{1}) = R;
+        NRs(measure{1}) = NR;
     end
     fprintf('\nDone.');
 
@@ -59,18 +59,18 @@ function selectFeature()
         NR_M = mean(NRs(measure{1}), 4);
 
         fprintf('\nSelecting significant channels on each frequency for "%s"\n', measure{1});
-        Fs = nan;
+        selected_channels = nan;
         for frequency = 1:4
             significance_level = 0.05;
             h = [];
             while size(find(h == 1), 2) < 3
-                [h, p] = ttest2(R_M(:,:,frequency), NR_M(:,:,frequency), 'Alpha', significance_level);
+                h = ttest2(R_M(:,:,frequency), NR_M(:,:,frequency), 'Alpha', significance_level);
                 significance_level = significance_level + 0.001;
             end
             fprintf('max significance level: %f\n', significance_level);
-            Fs{frequency} = find(h == 1);
+            selected_channels{frequency} = find(h == 1);
         end
-        FEATURES(measure{1}) = Fs;
+        FEATURES(measure{1}) = selected_channels;
         disp('Done.');
     end
     save(strcat(output_root, '\FEATURES.mat'), 'FEATURES');
