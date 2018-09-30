@@ -1,5 +1,5 @@
 measure = 'ddtf';
-r = Rs(measure);
+r = Rs(measure); % chanel/chnnel/freq/PATIENT
 nr = NRs(measure);
 m = mean(r, 4) - mean(nr, 4);
 features = FEATURES(measure);

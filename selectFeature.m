@@ -20,11 +20,11 @@ function selectFeature()
         fprintf(strcat('-', num2str(patient_number)));
         S = load(path{1}); % load gpdc, ddtf, pcoh, dtf, ggc, icoh
         for measure = measures
-            C(strcat(num2str(index), measure{1})) = timeFrequencyAggregation(S.(measure{1}));
+            C(strcat(num2str(index), measure{1})) = timeFrequencyAggregation(S.(measure{1}));%for each meseure and for each patient
         end
     end
-
-    fprintf('\nDone.\nConstructing R & NR...');
+    fprintf('\nDone.');
+    fprintf('\nConstructing R & NR...');
     Rs = containers.Map;
     NRs = containers.Map;
     for measure = measures
@@ -52,7 +52,6 @@ function selectFeature()
     fprintf('\nDone.');
 
     save(strcat(output_root, '\Rs_NRs.mat'), 'Rs', 'NRs');
-
     FEATURES = containers.Map;
     for measure = measures
         R_M = mean(Rs(measure{1}), 4);

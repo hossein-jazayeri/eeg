@@ -1,6 +1,6 @@
 function C = timeFrequencyAggregation(measure)
 	chunk = 1;
-    step_size = 67;
+    step_size = 67; % connectivity window step size is 0.03 so "67*0.03=2.01seconds"
 	[c1, c2, f, t] = size(measure);
 	measure_time_segments = zeros(c1, c2, f, size(1:step_size:t, 2));
 	for ts = 1:size(measure_time_segments, 4)

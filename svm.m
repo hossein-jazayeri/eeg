@@ -8,22 +8,22 @@ function svm()
     Xy = containers.Map;
     fprintf('measure | frequency | validation accuracy\n');
     for measure = measures
-        Rs = S.Rs(measure{1});
+        Rs = S.Rs(measure{1});%cell to srting
         NRs = S.NRs(measure{1});
         features = FEATURES(measure{1});
 
-        Rs_dataset_size = size(Rs, 4);
-        NRs_dataset_size = size(NRs, 4);
+        Rs_dataset_size = size(Rs, 4);%forth dimention :24
+        NRs_dataset_size = size(NRs, 4);%'' : 21
         F_size = size(Rs, 3);
 
-        for frequency = 1:F_size
-            NZ_channels = features{frequency};
-            NZ_channels_size = size(NZ_channels, 2);
-            NZ_Rs = Rs(NZ_channels, NZ_channels, frequency, :);
-            NZ_NRs = NRs(NZ_channels, NZ_channels, frequency, :);
+        for frequency = 1:F_size  %for each freq. band 
+            selected_channels = features{frequency};
+            selected_channels_size = size(selected_channels, 2);
+            NZ_Rs = Rs(selected_channels, selected_channels, frequency, :);
+            NZ_NRs = NRs(selected_channels, selected_channels, frequency, :);
 
             %[X, y] = doubleInputSize(NZ_Rs, NZ_NRs, Rs_dataset_size, NRs_dataset_size, NZ_channels_size);
-            [X, y] = doubleInputSizeExcludeDiagonal(NZ_Rs, NZ_NRs, Rs_dataset_size, NRs_dataset_size, NZ_channels_size);
+            [X, y] = doubleInputSizeExcludeDiagonal(NZ_Rs, NZ_NRs, Rs_dataset_size, NRs_dataset_size, selected_channels_size);
             %[X, y] = correspondingsMeanExcludeDiagonal(NZ_Rs, NZ_NRs, Rs_dataset_size, NRs_dataset_size, NZ_channels_size);
 
             Xy(strcat(measure{1}, num2str(frequency))) = [X y];
@@ -42,7 +42,7 @@ function svm()
             fprintf('%s          %d             %.1f%%\n', measure{1}, frequency, validationAccuracy * 100);
         end
     end
-
+%creating input structure for Classifier APP
     Xy_gpdc_1 = Xy('gpdc1');Xy_gpdc_2 = Xy('gpdc2');Xy_gpdc_3 = Xy('gpdc3');Xy_gpdc_4 = Xy('gpdc4');
     Xy_ggc_1 = Xy('ggc1');Xy_ggc_2 = Xy('ggc2');Xy_ggc_3 = Xy('ggc3');Xy_ggc_4 = Xy('ggc4');
     Xy_ddtf_1 = Xy('ddtf1');Xy_ddtf_2 = Xy('ddtf2');Xy_ddtf_3 = Xy('ddtf3');Xy_ddtf_4 = Xy('ddtf4');
